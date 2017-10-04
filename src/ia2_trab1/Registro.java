@@ -4,7 +4,8 @@ package ia2_trab1;
  *
  * @author Bruno
  */
-public class Registro {
+public class Registro implements Comparable<Registro> {
+    Integer dataCompar;
     int tipoRegistro, dataPregao, codBDI;
     String codNEG;
     int tipoMerc;
@@ -47,6 +48,7 @@ public class Registro {
         this.ptoexe = Integer.parseInt(ptoexe);
         this.codISIN = codISIN;
         this.disMes = Integer.parseInt(disMes);
+        this.dataCompar = this.dataPregao;
     }
 
     public int getTipoRegistro() {
@@ -151,5 +153,10 @@ public class Registro {
 
     public int getDisMes() {
         return disMes;
+    }
+
+    @Override
+    public int compareTo(Registro t) {
+        return this.dataCompar.compareTo(t.dataCompar);
     }
 }

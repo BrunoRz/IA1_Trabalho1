@@ -171,9 +171,11 @@ public class NewJFrame extends javax.swing.JFrame {
                 empresas.add(new Empresa(nome, l.interpretar(historico)));
             }            
         }
-        empresas.forEach((e) -> {
-            e.teste();
-        });
+//        empresas.forEach((e) -> {
+//            e.teste();
+//        });
+        Investidor i = new Investidor();
+        i.calculaProbabilidades(empresas);
     }//GEN-LAST:event_btSelecionarActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
