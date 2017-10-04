@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 public class Leitor {
  
     public ArrayList<String> readHist(String symbol, int ano) throws Exception {
-        String filePath = "C:\\Users\\Alessandra\\Desktop\\IA2_Trab1\\src\\cotahist\\COTAHIST.A",
+        String filePath = "C:\\Users\\Alessandra\\Documents\\GitHub\\IA2_Trabalho01\\src\\cotahist\\COTAHIST.A",
                fileYear = String.valueOf(ano);
         List<String> histValues = new ArrayList<>();
 

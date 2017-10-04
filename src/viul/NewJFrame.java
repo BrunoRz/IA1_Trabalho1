@@ -28,7 +28,7 @@ public class NewJFrame extends javax.swing.JFrame {
     public NewJFrame() {
         initComponents();
         
-        String filePath = "C:\\Users\\Alessandra\\Desktop\\IA2_Trab1\\src\\cotahist\\COTAHIST.A1994";
+        String filePath = "C:\\Users\\Alessandra\\Documents\\GitHub\\IA2_Trabalho01\\src\\cotahist\\COTAHIST.A1994";
 
         List<String> histValues = new ArrayList<>();
         try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
@@ -37,7 +37,7 @@ public class NewJFrame extends javax.swing.JFrame {
             System.out.println("Error while reading file.");
         }
         
-        filePath = "C:\\Users\\Alessandra\\Desktop\\IA2_Trab1\\src\\cotahist\\COTAHIST.A1995";
+        filePath = "C:\\Users\\Alessandra\\Documents\\GitHub\\IA2_Trabalho01\\src\\cotahist\\COTAHIST.A1995";
         try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
             histValues = stream.collect(Collectors.toList());
         } catch (IOException e) {
