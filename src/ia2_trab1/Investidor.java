@@ -27,20 +27,24 @@ public class Investidor {
         // probabilidades[i+2]: probCompra;
         // probabilidades[i+3]: probVenda.
         
-        empresas.forEach((Empresa e) -> {
+        for (Empresa e: empresas) {
             int numReg, cont = 0;
-            int valorVenda = 0;
-            int qtdeSubida = 0, qtdeDescida = 0;
-            float probSubida = 0f, probDescida = 0f, probCompra = 0f, probVenda = 0f;
+            int valorVenda = 0, totalMedio = 0, totalValorVenda = 0;
+            int qtdeSubida = 0, qtdeDescida = 0, totalTotNeg = 0, totalQuaTot = 0, totalVolTot = 0;
+            float probSubida, probDescida, probCompra, probVenda, mediaVenda, valorMedio;
             
             numReg = e.registro.size();
             
             Arrays.sort(e.registro.toArray());
             
             for (Registro r : e.registro) {
+                totalMedio += r.getPrecoMed();
+                totalTotNeg += r.getTotNeg();
+                totalQuaTot += r.getQuantTot();
+                totalVolTot += r.getVolumeTotal();
                 if (cont == 0) {
                     valorVenda = r.getPrecoOfv();
-                } else if (cont < numReg) {
+                } else {
                     if (r.getPrecoOfv() > valorVenda) {
                         qtdeSubida++;
                     } else if (r.getPrecoOfv() < valorVenda) {
@@ -48,14 +52,23 @@ public class Investidor {
                     }
                     valorVenda = r.getPrecoOfv();
                 }
+                totalValorVenda += valorVenda;
                 cont++;
             }
             
-            probSubida = qtdeSubida/numReg;
-            probDescida = qtdeDescida/numReg;
-            
-            // falta calcular probCompra e probVenda
-        });
+            mediaVenda = (float) totalValorVenda/numReg;
+            valorMedio = (float) mediaVenda/(totalMedio/numReg);
+                        
+            probSubida = (float) qtdeSubida/numReg;
+            probDescida = (float) qtdeDescida/numReg;
+            probCompra = (float) totalTotNeg/totalQuaTot + valorMedio;
+            probVenda = (float) totalQuaTot/totalVolTot + valorMedio;
+                        
+            probabilidades.add(probSubida);
+            probabilidades.add(probDescida);
+            probabilidades.add(probCompra);
+            probabilidades.add(probVenda);
+        }
         
         
         return probabilidades;
