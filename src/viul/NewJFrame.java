@@ -3,15 +3,11 @@ package viul;
 import ia2_trab1.Empresa;
 import ia2_trab1.Investidor;
 import ia2_trab1.Leitor;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.swing.DefaultListModel;
 
 /**
@@ -21,40 +17,40 @@ import javax.swing.DefaultListModel;
 public class NewJFrame extends javax.swing.JFrame {
 
     DefaultListModel listaGeral = new DefaultListModel(),
-              listaSelecionada  = new DefaultListModel();
+               listaSelecionada = new DefaultListModel();
     Investidor investidor = new Investidor();
     Leitor l = new Leitor();
     
     public NewJFrame() {
-        initComponents();
+        initComponents();        
+        preencherListaEmpresas();      
+    }
+    
+    private void preencherListaEmpresas(){          
+        ArrayList<String> listaEmpresas = new ArrayList<>();
         
-        String filePath = "C:\\Users\\Alessandra\\Documents\\GitHub\\IA2_Trabalho01\\src\\cotahist\\COTAHIST.A1994";
-
-        List<String> histValues = new ArrayList<>();
-        try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
-            histValues = stream.collect(Collectors.toList());
-        } catch (IOException e) {
-            System.out.println("Error while reading file.");
+        try {
+            l.getNomesEmpresas(1994).forEach((String empresa) -> {
+                listaEmpresas.add(empresa.substring(27, 39));
+            });
+        } catch (Exception ex) {
+            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        filePath = "C:\\Users\\Alessandra\\Documents\\GitHub\\IA2_Trabalho01\\src\\cotahist\\COTAHIST.A1995";
-        try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
-            histValues = stream.collect(Collectors.toList());
-        } catch (IOException e) {
-            System.out.println("Error while reading file.");
-        }        
+        try {
+            l.getNomesEmpresas(1995).forEach((String empresa) -> {
+                listaEmpresas.add(empresa.substring(27, 39));
+            });
+        } catch (Exception ex) {
+            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
-        ArrayList<String> empresa = new ArrayList<>();
-        histValues.forEach((h) -> {            
-            empresa.add(h.substring(27, 39));
-        });
-        
-        empresa.stream().distinct().sorted().forEachOrdered((t) -> {
+        listaEmpresas.stream().distinct().sorted().forEachOrdered((t) -> {
             listaGeral.addElement(t);
         });
         
         this.listaoGeral.setModel(listaGeral);
-        this.listaAprovados.setModel(listaSelecionada);
+        this.listaAprovados.setModel(listaSelecionada);        
     }
 
     /**
@@ -143,37 +139,31 @@ public class NewJFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btToRightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btToRightActionPerformed
-        if (listaoGeral.getSelectedIndex() > -1) {
+        if (listaoGeral.getSelectedIndex() > -1)
             listaSelecionada.addElement(listaGeral.getElementAt(listaoGeral.getSelectedIndex()));
-        }
     }//GEN-LAST:event_btToRightActionPerformed
 
     private void btToLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btToLeftActionPerformed
-        if (listaAprovados.getSelectedIndex() > -1) {
+        if (listaAprovados.getSelectedIndex() > -1)
             listaSelecionada.removeElement(listaSelecionada.getElementAt(listaAprovados.getSelectedIndex()));
-        }
     }//GEN-LAST:event_btToLeftActionPerformed
 
     private void btSelecionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSelecionarActionPerformed
         ArrayList<Empresa> empresas = new ArrayList<>();
         ArrayList<String> historico = new ArrayList<>();
         String nome;
-        if (!listaSelecionada.isEmpty()) {
+        if (!listaSelecionada.isEmpty())
             for (int i = 0; i < listaSelecionada.size(); i++) {
                 nome = listaAprovados.getModel().getElementAt(i);
-                for (int ano = 1994; ano < 1996; ano++) {
+                for (int ano = 1994; ano < 1996; ano++)
                     try {
-                        historico = l.readHist(nome, ano);
+                        historico = l.getHistoricoEmpresa(nome, ano);
                     } catch (Exception ex) {
                         Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                }                
                 empresas.add(new Empresa(nome, l.interpretar(historico)));
-            }            
-        }
-//        empresas.forEach((e) -> {
-//            e.teste();
-//        });
+            }
+        
         Investidor i = new Investidor();
         i.calculaProbabilidades(empresas);
     }//GEN-LAST:event_btSelecionarActionPerformed

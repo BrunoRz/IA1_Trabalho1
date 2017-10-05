@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,20 +12,31 @@ import java.util.stream.Stream;
  * @author Bruno
  */
 public class Leitor {
+    
+    String filePath = System.getProperty("user.dir") + "\\src\\cotahist\\COTAHIST.A";
  
-    public ArrayList<String> readHist(String symbol, int ano) throws Exception {
-        String filePath = "C:\\Users\\Alessandra\\Documents\\GitHub\\IA2_Trabalho01\\src\\cotahist\\COTAHIST.A",
-               fileYear = String.valueOf(ano);
-        List<String> histValues = new ArrayList<>();
-
-        try (Stream<String> stream = Files.lines(Paths.get(filePath + fileYear))) {
-            histValues = stream
+    public ArrayList<String> getNomesEmpresas(int ano) throws Exception {
+        ArrayList<String> nomesEmpresas = new ArrayList<>();
+        
+        try (Stream<String> stream = Files.lines(Paths.get(filePath + String.valueOf(ano)))) {
+            nomesEmpresas = (ArrayList<String>) stream.collect(Collectors.toList());
+        } catch (IOException e) {
+            System.out.println("Error while reading file."); throw e;
+        }
+        return nomesEmpresas;
+    }
+    
+    public ArrayList<String> getHistoricoEmpresa(String symbol, int ano) throws Exception {
+        ArrayList<String> historicoEmpresa = new ArrayList<>();
+        
+        try (Stream<String> stream = Files.lines(Paths.get(filePath + String.valueOf(ano)))) {
+            historicoEmpresa = (ArrayList<String>) stream
                 .filter(line -> line.contains(symbol))
                 .collect(Collectors.toList());
         } catch (IOException e) {
             System.out.println("Error while reading file."); throw e;
         }
-        return (ArrayList<String>) histValues;
+        return historicoEmpresa;
     }
     
     public ArrayList<Registro> interpretar(ArrayList<String> histValues){
