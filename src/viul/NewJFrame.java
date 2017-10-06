@@ -22,23 +22,15 @@ public class NewJFrame extends javax.swing.JFrame {
     Leitor l = new Leitor();
     
     public NewJFrame() {
-        initComponents();        
-        preencherListaEmpresas();      
+        initComponents();
+        preencherListaEmpresas();
     }
     
-    private void preencherListaEmpresas(){          
+    private void preencherListaEmpresas(){
         ArrayList<String> listaEmpresas = new ArrayList<>();
         
         try {
-            l.getNomesEmpresas(1994).forEach((String empresa) -> {
-                listaEmpresas.add(empresa.substring(27, 39));
-            });
-        } catch (Exception ex) {
-            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        try {
-            l.getNomesEmpresas(1995).forEach((String empresa) -> {
+            l.getNomesEmpresas(1994, 1995).forEach((String empresa) -> {
                 listaEmpresas.add(empresa.substring(27, 39));
             });
         } catch (Exception ex) {
@@ -149,23 +141,23 @@ public class NewJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btToLeftActionPerformed
 
     private void btSelecionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSelecionarActionPerformed
-        ArrayList<Empresa> empresas = new ArrayList<>();
-        ArrayList<String> historico = new ArrayList<>();
-        String nome;
-        if (!listaSelecionada.isEmpty())
+        if (!listaSelecionada.isEmpty()){
+            ArrayList<Empresa> empresas = new ArrayList<>();
+            String nome;
+            
             for (int i = 0; i < listaSelecionada.size(); i++) {
                 nome = listaAprovados.getModel().getElementAt(i);
-                for (int ano = 1994; ano < 1996; ano++)
-                    try {
-                        historico = l.getHistoricoEmpresa(nome, ano);
-                    } catch (Exception ex) {
-                        Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                empresas.add(new Empresa(nome, l.interpretar(historico)));
+                try {
+                    empresas.add(new Empresa(nome,
+                                    l.interpretar(l.getHistoricoEmpresa(nome, 1994, 1995))));
+                } catch (Exception ex) {
+                    Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-        
-        Investidor i = new Investidor();
-        i.calculaProbabilidades(empresas);
+            
+            Investidor i = new Investidor();
+            i.calculaProbabilidades(empresas);
+        }
     }//GEN-LAST:event_btSelecionarActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

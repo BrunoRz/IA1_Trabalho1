@@ -19,10 +19,23 @@ public class Leitor {
         ArrayList<String> nomesEmpresas = new ArrayList<>();
         
         try (Stream<String> stream = Files.lines(Paths.get(filePath + String.valueOf(ano)))) {
-            nomesEmpresas = (ArrayList<String>) stream.collect(Collectors.toList());
+            nomesEmpresas.addAll(stream.collect(Collectors.toList()));
         } catch (IOException e) {
             System.out.println("Error while reading file."); throw e;
         }
+        return nomesEmpresas;
+    }
+    
+    public ArrayList<String> getNomesEmpresas(int desde, int ate) throws Exception {
+        ArrayList<String> nomesEmpresas = new ArrayList<>();
+        
+        for (int ano = desde; ano < ate + 1; ano++) {
+            try (Stream<String> stream = Files.lines(Paths.get(filePath + String.valueOf(ano)))) {
+                nomesEmpresas.addAll(stream.collect(Collectors.toList()));
+            } catch (IOException e) {
+                System.out.println("Error while reading file."); throw e;
+            }
+        }        
         return nomesEmpresas;
     }
     
@@ -30,11 +43,26 @@ public class Leitor {
         ArrayList<String> historicoEmpresa = new ArrayList<>();
         
         try (Stream<String> stream = Files.lines(Paths.get(filePath + String.valueOf(ano)))) {
-            historicoEmpresa = (ArrayList<String>) stream
-                .filter(line -> line.contains(symbol))
-                .collect(Collectors.toList());
+            historicoEmpresa.addAll(
+                    stream.filter(line -> line.contains(symbol))
+                    .collect(Collectors.toList()));
         } catch (IOException e) {
             System.out.println("Error while reading file."); throw e;
+        }
+        return historicoEmpresa;
+    }
+    
+    public ArrayList<String> getHistoricoEmpresa(String symbol, int desde, int ate) throws Exception {
+        ArrayList<String> historicoEmpresa = new ArrayList<>();
+        
+        for (int ano = desde; ano < ate + 1; ano++) {
+            try (Stream<String> stream = Files.lines(Paths.get(filePath + String.valueOf(ano)))) {
+                historicoEmpresa.addAll(
+                        stream.filter(line -> line.contains(symbol))
+                        .collect(Collectors.toList()));
+            } catch (IOException e) {
+                System.out.println("Error while reading file."); throw e;
+            }
         }
         return historicoEmpresa;
     }
