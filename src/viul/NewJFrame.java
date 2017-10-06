@@ -156,7 +156,10 @@ public class NewJFrame extends javax.swing.JFrame {
             }
             
             Investidor i = new Investidor();
-            i.calculaProbabilidades(empresas);
+            i.setListaEmpresas(empresas);
+            i.getListaEmpresas().forEach((e) -> {
+                i.calculaProbabilidades(e);
+            });
         }
     }//GEN-LAST:event_btSelecionarActionPerformed
 
