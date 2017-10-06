@@ -57,9 +57,9 @@ public class Investidor {
             probabilidades.add(probCompra);
             probabilidades.add(probVenda);
         }
-//        probabilidades.forEach((p) -> {
-//            System.out.println("Probs: " + p);
-//        });
+        probabilidades.forEach((p) -> {
+            System.out.println("Probs: " + p);
+        });
         return probabilidades;
     }
     
@@ -79,7 +79,7 @@ public class Investidor {
     }
     
     public Float predicao(Empresa empresa, ArrayList<Float> probabilidades) throws Exception {
-        int nroAcoes = 0;
+        int nroAcoes = 0; 
         float saldo = 0.0f;
         
         Leitor l = new Leitor();
@@ -89,49 +89,7 @@ public class Investidor {
         Arrays.sort(empresa.registro.toArray());
         
         for (Registro r : empresa.registro) {
-            if (nroAcoes == 0) {
-                if (probabilidades.get(0) > 0.50 && probabilidades.get(2) > 0.50) {
-                    saldo -= (float) r.precoMed;
-                    nroAcoes++;
-                    probabilidades = atualizaProb(probabilidades, 0, 2);
-                } else if (probabilidades.get(0) > 0.35) {
-                    saldo -= (float) r.precoMed;
-                    nroAcoes++;
-                    probabilidades = atualizaProb(probabilidades, 0, 3);
-                } else {
-                    probabilidades = atualizaProb(probabilidades, 1, 3);
-                }
-            } else {
-                if (saldo > 0.0) {
-                    if (probabilidades.get(0) > 0.65 && probabilidades.get(2) > 0.65) {
-                        saldo -= (float) r.precoMed;
-                        nroAcoes++;
-                        probabilidades = atualizaProb(probabilidades, 0, 2);
-                    } else if (probabilidades.get(0) > 0.4) {
-                        saldo -= (float) r.precoMed;
-                        nroAcoes++;
-                        probabilidades = atualizaProb(probabilidades, 0, 3);
-                    } else {
-                        saldo += (float) r.precoMed;
-                        nroAcoes--;
-                        probabilidades = atualizaProb(probabilidades, 1, 3);
-                    }
-                } else {
-                    if (probabilidades.get(1) > 0.50 && probabilidades.get(3) > 0.65) {
-                        saldo += (float) r.precoMed;
-                        nroAcoes--;
-                        probabilidades = atualizaProb(probabilidades, 1, 3);
-                    } else if (probabilidades.get(1) > 0.4) {
-                        saldo += (float) r.precoMed;
-                        nroAcoes--;
-                        probabilidades = atualizaProb(probabilidades, 1, 2);
-                    } else {
-                        saldo -= (float) r.precoMed;
-                        nroAcoes++;
-                        probabilidades = atualizaProb(probabilidades, 0, 2);
-                    }
-                }
-            }
+            
         }
         System.out.println(nroAcoes);
         System.out.println("SALDO: " + saldo);
