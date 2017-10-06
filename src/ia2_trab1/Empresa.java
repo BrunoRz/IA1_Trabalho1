@@ -18,4 +18,10 @@ public class Empresa {
     public void teste(){
         System.out.println("A EMPRESA " + nome + " TEM " + registro.size() + " REGISTROS");
     }
+
+    public String getNome() {
+        return nome;
+    }
+    
+    
 }

@@ -22,18 +22,18 @@ public class Investidor {
         ArrayList<Float> probabilidades = new ArrayList<>();
         // probabilidades[probSubida, probDescida, probCompra, probVenda]
         
-        int numReg = empresa.registro.size(), cont = 0,
-            valorVenda = 0, totalMedio = 0, totalValorVenda = 0,
-            qtdeSubida = 0, qtdeDescida = 0, totalTotNeg = 0, totalQuaTot = 0, totalVolTot = 0;
+        int numReg = empresa.registro.size(), cont = 0, qtdeSubida = 0, qtdeDescida = 0;
+        float valorVenda = 0f, totalMedio = 0f, totalValorVenda = 0f,
+            totalTotNeg = 0f, totalQuaTot = 0f, totalVolTot = 0f;
         float probSubida, probDescida, probCompra, probVenda, mediaVenda, valorMedio;
-            
+                    
         if (numReg > 0) {
             Arrays.sort(empresa.registro.toArray());                
             for (Registro r : empresa.registro) {
-                totalMedio += r.getPrecoMed();
-                totalTotNeg += r.getTotNeg();
-                totalQuaTot += r.getQuantTot();
-                totalVolTot += r.getVolumeTotal();
+                totalMedio += (float) r.getPrecoMed();
+                totalTotNeg += (float) r.getTotNeg();
+                totalQuaTot += (float) r.getQuantTot();
+                totalVolTot += (float) r.getVolumeTotal();
                 if (cont > 0)
                     if (r.getPrecoOfv() > valorVenda)
                         qtdeSubida++;
@@ -56,7 +56,86 @@ public class Investidor {
             probabilidades.add(probDescida);
             probabilidades.add(probCompra);
             probabilidades.add(probVenda);
-            }
+        }
+//        probabilidades.forEach((p) -> {
+//            System.out.println("Probs: " + p);
+//        });
         return probabilidades;
     }
+    
+    public Float probCond(Float probA, Float probB) {
+        return (probA * probB)/probB;
+    }
+    
+    public ArrayList<Float> atualizaProb(ArrayList<Float> probabilidades, Integer SD, int CV) {
+        for (int i = 0; i < 4; i++) {
+            if (i < 2) {
+                probabilidades.set(i, probCond(probabilidades.get(i), probabilidades.get(SD)));
+            } else {
+                probabilidades.set(i, probCond(probabilidades.get(i), probabilidades.get(CV)));
+            }
+        }
+        return probabilidades;
+    }
+    
+    public Float predicao(Empresa empresa, ArrayList<Float> probabilidades) throws Exception {
+        int nroAcoes = 0;
+        float saldo = 0.0f;
+        
+        Leitor l = new Leitor();
+        
+        empresa.registro = l.interpretar(l.getHistoricoEmpresa(empresa.getNome(), 1996));
+        
+        Arrays.sort(empresa.registro.toArray());
+        
+        for (Registro r : empresa.registro) {
+            if (nroAcoes == 0) {
+                if (probabilidades.get(0) > 0.50 && probabilidades.get(2) > 0.50) {
+                    saldo -= (float) r.precoMed;
+                    nroAcoes++;
+                    probabilidades = atualizaProb(probabilidades, 0, 2);
+                } else if (probabilidades.get(0) > 0.35) {
+                    saldo -= (float) r.precoMed;
+                    nroAcoes++;
+                    probabilidades = atualizaProb(probabilidades, 0, 3);
+                } else {
+                    probabilidades = atualizaProb(probabilidades, 1, 3);
+                }
+            } else {
+                if (saldo > 0.0) {
+                    if (probabilidades.get(0) > 0.65 && probabilidades.get(2) > 0.65) {
+                        saldo -= (float) r.precoMed;
+                        nroAcoes++;
+                        probabilidades = atualizaProb(probabilidades, 0, 2);
+                    } else if (probabilidades.get(0) > 0.4) {
+                        saldo -= (float) r.precoMed;
+                        nroAcoes++;
+                        probabilidades = atualizaProb(probabilidades, 0, 3);
+                    } else {
+                        saldo += (float) r.precoMed;
+                        nroAcoes--;
+                        probabilidades = atualizaProb(probabilidades, 1, 3);
+                    }
+                } else {
+                    if (probabilidades.get(1) > 0.50 && probabilidades.get(3) > 0.65) {
+                        saldo += (float) r.precoMed;
+                        nroAcoes--;
+                        probabilidades = atualizaProb(probabilidades, 1, 3);
+                    } else if (probabilidades.get(1) > 0.4) {
+                        saldo += (float) r.precoMed;
+                        nroAcoes--;
+                        probabilidades = atualizaProb(probabilidades, 1, 2);
+                    } else {
+                        saldo -= (float) r.precoMed;
+                        nroAcoes++;
+                        probabilidades = atualizaProb(probabilidades, 0, 2);
+                    }
+                }
+            }
+        }
+        System.out.println(nroAcoes);
+        System.out.println("SALDO: " + saldo);
+        return saldo;
+    }
+    
 }

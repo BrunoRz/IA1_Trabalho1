@@ -150,7 +150,7 @@ public class NewJFrame extends javax.swing.JFrame {
                 try {
                     empresas.add(new Empresa(nome,
                                     l.interpretar(l.getHistoricoEmpresa(nome, 1994, 1995))));
-                } catch (Exception ex) {
+                    } catch (Exception ex) {
                     Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -158,7 +158,11 @@ public class NewJFrame extends javax.swing.JFrame {
             Investidor i = new Investidor();
             i.setListaEmpresas(empresas);
             i.getListaEmpresas().forEach((e) -> {
-                i.calculaProbabilidades(e);
+                try {
+                    i.predicao(e, i.calculaProbabilidades(e));
+                } catch (Exception ex) {
+                    Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             });
         }
     }//GEN-LAST:event_btSelecionarActionPerformed
