@@ -179,4 +179,14 @@ public class Investidor {
         return saldo;
     }
     
+    public Float analise(Empresa empresa) {
+        float saldo = 0f;
+        
+        for (Registro r : empresa.registro) {
+            saldo += r.precoOfv;
+            saldo -= r.precoOfc;
+        }
+        
+        return saldo;
+    }
 }

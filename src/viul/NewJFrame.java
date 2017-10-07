@@ -3,6 +3,7 @@ package viul;
 import ia2_trab1.Empresa;
 import ia2_trab1.Investidor;
 import ia2_trab1.Leitor;
+import ia2_trab1.Registro;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -165,7 +166,18 @@ public class NewJFrame extends javax.swing.JFrame {
                     Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
+            i.getListaEmpresas().forEach((e) -> {
+                Empresa empresa1996 = null;
+                try {
+                    empresa1996 = new Empresa(e.getNome(),
+                            l.interpretar(l.getHistoricoEmpresa(e.getNome(), 1996)));
+                } catch (Exception ex) {
+                    Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                System.out.println("SALDO DE 1996: " + i.analise(empresa1996));
+            });
         }
+        this.dispose();
     }//GEN-LAST:event_btSelecionarActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
