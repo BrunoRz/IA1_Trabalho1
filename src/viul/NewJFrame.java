@@ -159,7 +159,8 @@ public class NewJFrame extends javax.swing.JFrame {
             i.setListaEmpresas(empresas);
             i.getListaEmpresas().forEach((e) -> {
                 try {
-                    i.predicao(e, i.calculaProbabilidades(e));
+                    System.out.println("Saldo com a empresa " + e.getNome() + 
+                            ": " + i.predicao(e, i.calculaProbabilidades(e)));
                 } catch (Exception ex) {
                     Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }

@@ -58,9 +58,9 @@ public class Investidor {
             probabilidades.add(probCompra);
             probabilidades.add(probVenda);
         }
-        probabilidades.forEach((p) -> {
-            System.out.println("Probs: " + p);
-        });
+//        probabilidades.forEach((p) -> {
+//            System.out.println("Probs: " + p);
+//        });
         return probabilidades;
     }
     
@@ -176,8 +176,6 @@ public class Investidor {
                 }
             }
         }
-        System.out.println(nroAcoes);
-        System.out.println("SALDO: " + saldo);
         return saldo;
     }
     
