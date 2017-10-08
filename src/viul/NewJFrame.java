@@ -174,7 +174,7 @@ public class NewJFrame extends javax.swing.JFrame {
                 } catch (Exception ex) {
                     Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                System.out.println("SALDO DE 1996: " + i.analise(empresa1996));
+                System.out.println("SALDO DE "+ empresa1996.getNome() +"EM 1996: " + i.analise(empresa1996));
             });
         }
         this.dispose();
