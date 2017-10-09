@@ -83,20 +83,20 @@ public class Investidor {
         e.setProbVenda(probCondicional(e.getProbVenda(), prob));
     }
         
-    public Float predicao(Empresa e) throws Exception {
-        int nroAcoes = 0; 
-        float saldo = 0.0f;
+    public float[] predicao(Empresa e) throws Exception {
+        float[] predicao = new float[3]; // [comprou, vendeu, saldo]
+        int nroAcoes = 0;
         boolean bom, regular, ruim, comprou, vendeu;
         Leitor l = new Leitor();
-        
-        System.out.println(e.getNome());
         
         e.registro = l.interpretar(l.getHistoricoEmpresa(e.getNome(), 1996));
         Arrays.sort(e.registro.toArray());
         
         for (Registro r : e.registro) {
-            comprou = sucesso(e.getProbCompra());
-            vendeu = sucesso(e.getProbVenda());
+            if (comprou = sucesso(e.getProbCompra()))
+                predicao[0] += 1;
+            if (vendeu = sucesso(e.getProbVenda()))
+                predicao[1] += 1;
             if (e.getProbSubida() > e.getProbDescida()) {
                 bom = true;
                 regular = false;
@@ -114,12 +114,12 @@ public class Investidor {
             if (nroAcoes == 0) {
                 if (bom && comprou) {
                     nroAcoes++;
-                    saldo -= (float) r.precoOfc;
+                    predicao[2] -= (float) r.precoOfc;
                     atualizarSubDesc(e, 0);
                 } else if (regular && comprou) {
-                    if (saldo >= 0){
+                    if (predicao[2] >= 0){
                         nroAcoes++;
-                        saldo -= (float) r.precoOfc;
+                        predicao[2] -= (float) r.precoOfc;
                         atualizarSubDesc(e, 0);
                     } else {
                         atualizarSubDesc(e, -1);
@@ -133,35 +133,35 @@ public class Investidor {
                 if (bom) {
                     if (comprou) {
                         if (vendeu) {
-                            saldo += (float) r.precoOfv;
+                            predicao[2] += (float) r.precoOfv;
                             nroAcoes--;
                         }
-                        saldo -= (float) r.precoOfc;
+                        predicao[2] -= (float) r.precoOfc;
                         nroAcoes++;
                     } else {
                         if (vendeu) {
-                            saldo += (float) r.precoOfv;
+                            predicao[2] += (float) r.precoOfv;
                             nroAcoes--;
                         }
                     }
                     atualizarSubDesc(e, 0);
                 } else if (ruim) {
                     if (vendeu) {
-                        saldo += (float) r.precoOfv;
+                        predicao[2] += (float) r.precoOfv;
                         nroAcoes--;
                     }
                     atualizarSubDesc(e, 1);
                 } else {
                     if (comprou) {
                         if (vendeu) {
-                            saldo += (float) r.precoMed;
+                            predicao[2] += (float) r.precoMed;
                             nroAcoes--;
                         }
-                        saldo -= (float) r.precoMed;
+                        predicao[2] -= (float) r.precoMed;
                         nroAcoes++;
                     } else {
                         if (vendeu) {
-                            saldo += (float) r.precoMed;
+                            predicao[2] += (float) r.precoMed;
                             nroAcoes--;
                         }
                     }
@@ -169,7 +169,7 @@ public class Investidor {
                 }
             }
         }
-        return saldo;
+        return predicao;
     }
     
     public Float analise(Empresa empresa) {

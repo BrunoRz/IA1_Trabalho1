@@ -18,6 +18,7 @@ public class ResumoIndividual extends javax.swing.JPanel {
     DefaultListModel listaModel = new DefaultListModel();
     DecimalFormat floatToString = new DecimalFormat("##.## %");
     Investidor i, dados96;
+    float[][] matrizPredicao;
     
     public ResumoIndividual(Investidor i) {
         initComponents();
@@ -26,6 +27,7 @@ public class ResumoIndividual extends javax.swing.JPanel {
     }
     
     public void refresh(){
+        listaModel.clear();
         i.getListaEmpresas().forEach((e) -> {
             listaModel.addElement(e.getNome());
         });
@@ -33,9 +35,11 @@ public class ResumoIndividual extends javax.swing.JPanel {
         this.listaEmpresas.setModel(listaModel);
     }
     
-    void d96(){
+    void d96() throws Exception{
         Leitor l = new Leitor();
         ArrayList<Empresa> empresas = new ArrayList<>();
+        float[] vetorPredicao;        
+        
         i.getListaEmpresas().forEach((e) -> {
             try {
                 empresas.add(new Empresa(e.getNome(),
@@ -44,11 +48,18 @@ public class ResumoIndividual extends javax.swing.JPanel {
                 Logger.getLogger(ResumoIndividual.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
+        
         dados96 = new Investidor();
         dados96.setListaEmpresas(empresas);
-        dados96.getListaEmpresas().forEach((e) -> {
-            dados96.calcularProbabilidades(e);
-        });
+        matrizPredicao = new float[dados96.getListaEmpresas().size()][3];
+        
+        Empresa e;
+        for (int j = 0; j < dados96.getListaEmpresas().size(); j++) {
+            e = dados96.getListaEmpresas().get(j);
+            dados96.calcularProbabilidades(e);            
+            vetorPredicao = i.predicao(e);
+            System.arraycopy(vetorPredicao, 0, matrizPredicao[j], 0, 3);
+        }
     }
 
     /**
@@ -64,31 +75,34 @@ public class ResumoIndividual extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         listaEmpresas = new javax.swing.JList<>();
         jSeparator1 = new javax.swing.JSeparator();
-        jLabel2 = new javax.swing.JLabel();
+        jSeparator2 = new javax.swing.JSeparator();
+        lbNomeEmpresa = new javax.swing.JLabel();
         pnInfo = new javax.swing.JPanel();
         lbPS = new javax.swing.JLabel();
         lbPD = new javax.swing.JLabel();
         lbPV = new javax.swing.JLabel();
         lbPC = new javax.swing.JLabel();
-        pn9495 = new javax.swing.JPanel();
+        pnEstimativa = new javax.swing.JPanel();
         lbPSD = new javax.swing.JLabel();
         lbPDD = new javax.swing.JLabel();
         lbPVD = new javax.swing.JLabel();
         lbPCD = new javax.swing.JLabel();
-        lb9495 = new javax.swing.JLabel();
-        lbEstimativa = new javax.swing.JLabel();
-        pnEstimativa = new javax.swing.JPanel();
-        lbPSE = new javax.swing.JLabel();
-        lbPDE = new javax.swing.JLabel();
-        lbPVE = new javax.swing.JLabel();
-        lbPCE = new javax.swing.JLabel();
-        btAtualizar = new javax.swing.JButton();
         pnReal = new javax.swing.JPanel();
         lbPSR = new javax.swing.JLabel();
         lbPDR = new javax.swing.JLabel();
         lbPVR = new javax.swing.JLabel();
         lbPCR = new javax.swing.JLabel();
+        lbEstimativa = new javax.swing.JLabel();
         lbReal = new javax.swing.JLabel();
+        btAtualizar = new javax.swing.JButton();
+        pnEstimativa1 = new javax.swing.JPanel();
+        txtCompras = new javax.swing.JLabel();
+        txtVendas = new javax.swing.JLabel();
+        txtSaldo = new javax.swing.JLabel();
+        pnInfo1 = new javax.swing.JPanel();
+        lbCompras = new javax.swing.JLabel();
+        lbVendas = new javax.swing.JLabel();
+        lbSaldo = new javax.swing.JLabel();
 
         lbEmpresasInteresse.setText("Empresas de Interesse");
 
@@ -102,19 +116,20 @@ public class ResumoIndividual extends javax.swing.JPanel {
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel2.setText("NOME DA EMPRESA");
+        lbNomeEmpresa.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        lbNomeEmpresa.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbNomeEmpresa.setText("NOME DA EMPRESA");
 
-        lbPS.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbPS.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lbPS.setText("Probabilidade de Subida:");
 
-        lbPD.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbPD.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lbPD.setText("Probabilidade de Descida:");
 
-        lbPV.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbPV.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lbPV.setText("Probabilidade de Venda:");
 
-        lbPC.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbPC.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lbPC.setText("Probabilidade de Compra:");
 
         javax.swing.GroupLayout pnInfoLayout = new javax.swing.GroupLayout(pnInfo);
@@ -122,7 +137,7 @@ public class ResumoIndividual extends javax.swing.JPanel {
         pnInfoLayout.setHorizontalGroup(
             pnInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(lbPS, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(lbPD, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
+            .addComponent(lbPD, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(lbPC, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(lbPV, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -136,10 +151,10 @@ public class ResumoIndividual extends javax.swing.JPanel {
                 .addComponent(lbPC)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lbPV)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 22, Short.MAX_VALUE))
         );
 
-        pn9495.setBackground(new java.awt.Color(204, 204, 204));
+        pnEstimativa.setBackground(new java.awt.Color(204, 204, 204));
 
         lbPSD.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbPSD.setText("--,-- %");
@@ -153,18 +168,18 @@ public class ResumoIndividual extends javax.swing.JPanel {
         lbPCD.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbPCD.setText("--,-- %");
 
-        javax.swing.GroupLayout pn9495Layout = new javax.swing.GroupLayout(pn9495);
-        pn9495.setLayout(pn9495Layout);
-        pn9495Layout.setHorizontalGroup(
-            pn9495Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout pnEstimativaLayout = new javax.swing.GroupLayout(pnEstimativa);
+        pnEstimativa.setLayout(pnEstimativaLayout);
+        pnEstimativaLayout.setHorizontalGroup(
+            pnEstimativaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(lbPSD, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(lbPDD, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(lbPCD, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(lbPVD, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        pn9495Layout.setVerticalGroup(
-            pn9495Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pn9495Layout.createSequentialGroup()
+        pnEstimativaLayout.setVerticalGroup(
+            pnEstimativaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnEstimativaLayout.createSequentialGroup()
                 .addComponent(lbPSD)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lbPDD)
@@ -172,61 +187,8 @@ public class ResumoIndividual extends javax.swing.JPanel {
                 .addComponent(lbPCD)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lbPVD)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 22, Short.MAX_VALUE))
         );
-
-        lb9495.setBackground(new java.awt.Color(204, 204, 204));
-        lb9495.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lb9495.setText("94/95");
-        lb9495.setOpaque(true);
-
-        lbEstimativa.setBackground(new java.awt.Color(204, 204, 204));
-        lbEstimativa.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbEstimativa.setText("Estimativa");
-        lbEstimativa.setOpaque(true);
-
-        pnEstimativa.setBackground(new java.awt.Color(204, 204, 204));
-
-        lbPSE.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbPSE.setText("--,-- %");
-
-        lbPDE.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbPDE.setText("--,-- %");
-
-        lbPVE.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbPVE.setText("--,-- %");
-
-        lbPCE.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbPCE.setText("--,-- %");
-
-        javax.swing.GroupLayout pnEstimativaLayout = new javax.swing.GroupLayout(pnEstimativa);
-        pnEstimativa.setLayout(pnEstimativaLayout);
-        pnEstimativaLayout.setHorizontalGroup(
-            pnEstimativaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lbPSE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(lbPDE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(lbPCE, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(lbPVE, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        pnEstimativaLayout.setVerticalGroup(
-            pnEstimativaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnEstimativaLayout.createSequentialGroup()
-                .addComponent(lbPSE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lbPDE)
-                .addGap(18, 18, 18)
-                .addComponent(lbPCE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lbPVE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-
-        btAtualizar.setText("Atualizar");
-        btAtualizar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btAtualizarActionPerformed(evt);
-            }
-        });
 
         pnReal.setBackground(new java.awt.Color(204, 204, 204));
 
@@ -264,10 +226,80 @@ public class ResumoIndividual extends javax.swing.JPanel {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
+        lbEstimativa.setBackground(new java.awt.Color(204, 204, 204));
+        lbEstimativa.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbEstimativa.setText("Estimativa");
+        lbEstimativa.setOpaque(true);
+
         lbReal.setBackground(new java.awt.Color(204, 204, 204));
         lbReal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbReal.setText("Real");
         lbReal.setOpaque(true);
+
+        btAtualizar.setText("Atualizar");
+        btAtualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btAtualizarActionPerformed(evt);
+            }
+        });
+
+        pnEstimativa1.setBackground(new java.awt.Color(204, 204, 204));
+
+        txtCompras.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        txtCompras.setText("0");
+
+        txtVendas.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        txtVendas.setText("0");
+
+        txtSaldo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        txtSaldo.setText("0");
+
+        javax.swing.GroupLayout pnEstimativa1Layout = new javax.swing.GroupLayout(pnEstimativa1);
+        pnEstimativa1.setLayout(pnEstimativa1Layout);
+        pnEstimativa1Layout.setHorizontalGroup(
+            pnEstimativa1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnEstimativa1Layout.createSequentialGroup()
+                .addComponent(txtCompras, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(txtVendas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(txtSaldo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        pnEstimativa1Layout.setVerticalGroup(
+            pnEstimativa1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnEstimativa1Layout.createSequentialGroup()
+                .addComponent(txtCompras)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtVendas)
+                .addGap(18, 18, 18)
+                .addComponent(txtSaldo))
+        );
+
+        lbCompras.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbCompras.setText("Compras:");
+
+        lbVendas.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbVendas.setText("Vendas:");
+
+        lbSaldo.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbSaldo.setText("Saldo:");
+
+        javax.swing.GroupLayout pnInfo1Layout = new javax.swing.GroupLayout(pnInfo1);
+        pnInfo1.setLayout(pnInfo1Layout);
+        pnInfo1Layout.setHorizontalGroup(
+            pnInfo1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lbCompras, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+            .addComponent(lbVendas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(lbSaldo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        pnInfo1Layout.setVerticalGroup(
+            pnInfo1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnInfo1Layout.createSequentialGroup()
+                .addComponent(lbCompras)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lbVendas)
+                .addGap(18, 18, 18)
+                .addComponent(lbSaldo))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -279,29 +311,29 @@ public class ResumoIndividual extends javax.swing.JPanel {
                     .addComponent(lbEmpresasInteresse, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(btAtualizar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 632, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jSeparator2)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(pnInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lb9495, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-                            .addComponent(pn9495, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(lbEstimativa, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
                             .addComponent(pnEstimativa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lbReal, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lbReal, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(11, 11, 11)
-                                .addComponent(pnReal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap())
+                                .addGap(1, 1, 1)
+                                .addComponent(pnReal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(lbNomeEmpresa, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(pnInfo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(pnEstimativa1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(201, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -312,22 +344,30 @@ public class ResumoIndividual extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(82, 82, 82)
+                                .addComponent(lbNomeEmpresa)
+                                .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(lb9495)
                                     .addComponent(lbEstimativa)
                                     .addComponent(lbReal))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(pnInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(pn9495, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(pnEstimativa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(pnReal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addComponent(pnReal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(pnEstimativa1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(pnInfo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lbEmpresasInteresse, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1)))
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btAtualizar)))
                 .addContainerGap())
@@ -336,55 +376,68 @@ public class ResumoIndividual extends javax.swing.JPanel {
 
     private void btAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAtualizarActionPerformed
         refresh();
-        d96();
+        try {
+            d96();
+        } catch (Exception ex) {
+            Logger.getLogger(ResumoIndividual.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btAtualizarActionPerformed
 
     private void listaEmpresasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listaEmpresasMouseClicked
         Empresa e;
+        int index = this.listaEmpresas.getSelectedIndex();
         
-        e = i.getListaEmpresas().get(this.listaEmpresas.getSelectedIndex());                
+        e = i.getListaEmpresas().get(index);
         this.lbPSD.setText(String.valueOf(floatToString.format(e.getProbSubida())));
         this.lbPDD.setText(String.valueOf(floatToString.format(e.getProbDescida())));
         this.lbPCD.setText(String.valueOf(floatToString.format(e.getProbCompra())));
         this.lbPVD.setText(String.valueOf(floatToString.format(e.getProbVenda())));
         
-        e = dados96.getListaEmpresas().get(this.listaEmpresas.getSelectedIndex());                
+        e = dados96.getListaEmpresas().get(index);
         this.lbPSR.setText(String.valueOf(floatToString.format(e.getProbSubida())));
         this.lbPDR.setText(String.valueOf(floatToString.format(e.getProbDescida())));
         this.lbPCR.setText(String.valueOf(floatToString.format(e.getProbCompra())));
         this.lbPVR.setText(String.valueOf(floatToString.format(e.getProbVenda())));
+        
+       
+        this.txtCompras.setText(String.valueOf(matrizPredicao[index][0]));
+        this.txtVendas.setText(String.valueOf(matrizPredicao[index][1]));
+        this.txtSaldo.setText(String.valueOf(matrizPredicao[index][2]));
     }//GEN-LAST:event_listaEmpresasMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAtualizar;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JLabel lb9495;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JLabel lbCompras;
     private javax.swing.JLabel lbEmpresasInteresse;
     private javax.swing.JLabel lbEstimativa;
+    private javax.swing.JLabel lbNomeEmpresa;
     private javax.swing.JLabel lbPC;
     private javax.swing.JLabel lbPCD;
-    private javax.swing.JLabel lbPCE;
     private javax.swing.JLabel lbPCR;
     private javax.swing.JLabel lbPD;
     private javax.swing.JLabel lbPDD;
-    private javax.swing.JLabel lbPDE;
     private javax.swing.JLabel lbPDR;
     private javax.swing.JLabel lbPS;
     private javax.swing.JLabel lbPSD;
-    private javax.swing.JLabel lbPSE;
     private javax.swing.JLabel lbPSR;
     private javax.swing.JLabel lbPV;
     private javax.swing.JLabel lbPVD;
-    private javax.swing.JLabel lbPVE;
     private javax.swing.JLabel lbPVR;
     private javax.swing.JLabel lbReal;
+    private javax.swing.JLabel lbSaldo;
+    private javax.swing.JLabel lbVendas;
     private javax.swing.JList<String> listaEmpresas;
-    private javax.swing.JPanel pn9495;
     private javax.swing.JPanel pnEstimativa;
+    private javax.swing.JPanel pnEstimativa1;
     private javax.swing.JPanel pnInfo;
+    private javax.swing.JPanel pnInfo1;
     private javax.swing.JPanel pnReal;
+    private javax.swing.JLabel txtCompras;
+    private javax.swing.JLabel txtSaldo;
+    private javax.swing.JLabel txtVendas;
     // End of variables declaration//GEN-END:variables
 }
