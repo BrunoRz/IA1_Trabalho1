@@ -174,10 +174,16 @@ public class Investidor {
     
     public Float analise(Empresa empresa) {
         float saldo = 0f;
+        int nroAcoes = 0;
         
         for (Registro r : empresa.registro) {
-            saldo += r.precoOfv;
-            saldo -= r.precoOfc;
+            if (nroAcoes > 0) {
+                saldo += r.precoOfv;
+                saldo -= r.precoOfc;
+            } else {
+                saldo -= r.precoOfc;
+                nroAcoes++;
+            }
         }
         
         return saldo;
