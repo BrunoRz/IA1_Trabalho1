@@ -206,8 +206,8 @@ public class ListaEmpresas extends javax.swing.JPanel {
         i.getListaEmpresas().forEach((e) -> {
             try {
                 i.calcularProbabilidades(e);
-                System.out.println("Saldo com a empresa " + e.getNome() +
-                    ": " + i.predicao(e));
+//                System.out.println("Saldo com a empresa " + e.getNome() +
+//                    ": " + i.predicao(e));
             } catch (Exception ex) {
                 Logger.getLogger(ListaEmpresas.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -220,7 +220,7 @@ public class ListaEmpresas extends javax.swing.JPanel {
             } catch (Exception ex) {
                 Logger.getLogger(ListaEmpresas.class.getName()).log(Level.SEVERE, null, ex);
             }
-            System.out.println("SALDO DE 1996: " + i.analise(empresa1996));
+//            System.out.println("SALDO DE 1996: " + i.analise(empresa1996));
         });
         }
     }//GEN-LAST:event_btConfirmarActionPerformed

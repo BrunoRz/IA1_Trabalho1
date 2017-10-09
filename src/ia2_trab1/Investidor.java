@@ -46,7 +46,6 @@ public class Investidor {
             }
             mediaVenda = (float) totalValorVenda/numReg;
             valorMedio = (float) mediaVenda/(totalMedio/numReg);
-
             empresa.setProbSubida((float) qtdeSubida/numReg);
             empresa.setProbDescida((float) qtdeDescida/numReg);
             empresa.setProbCompra((float) totalTotNeg/totalQuaTot + valorMedio);
