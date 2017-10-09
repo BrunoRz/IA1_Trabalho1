@@ -3,13 +3,16 @@ package ia2_trab1;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import viul.ListaEmpresas;
 
 /**
  *
  * @author Alessandra
  */
 public class Investidor {
-    ArrayList<Empresa> listaEmpresas;
+    ArrayList<Empresa> listaEmpresas = new ArrayList<>();
     
     public void setListaEmpresas(ArrayList<Empresa> listaEmpresas) {
         this.listaEmpresas = listaEmpresas;
@@ -19,14 +22,11 @@ public class Investidor {
         return listaEmpresas;
     }
     
-    public ArrayList<Float> calculaProbabilidades(Empresa empresa) {
-        ArrayList<Float> probabilidades = new ArrayList<>();
-        // probabilidades[probSubida, probDescida, probCompra, probVenda]
-        
+    public void calcularProbabilidades(Empresa empresa) {
         int numReg = empresa.registro.size(), cont = 0, qtdeSubida = 0, qtdeDescida = 0;
         float valorVenda = 0f, totalMedio = 0f, totalValorVenda = 0f,
-            totalTotNeg = 0f, totalQuaTot = 0f, totalVolTot = 0f;
-        float probSubida, probDescida, probCompra, probVenda, mediaVenda, valorMedio;
+            totalTotNeg = 0f, totalQuaTot = 0f, totalVolTot = 0f,
+            mediaVenda, valorMedio;
                     
         if (numReg > 0) {
             Arrays.sort(empresa.registro.toArray());                
@@ -44,71 +44,64 @@ public class Investidor {
                 totalValorVenda += valorVenda;
                 cont++;
             }
-
             mediaVenda = (float) totalValorVenda/numReg;
             valorMedio = (float) mediaVenda/(totalMedio/numReg);
 
-            probSubida = (float) qtdeSubida/numReg;
-            probDescida = (float) qtdeDescida/numReg;
-            probCompra = (float) totalTotNeg/totalQuaTot + valorMedio;
-            probVenda = (float) totalQuaTot/totalVolTot + valorMedio;
-
-            probabilidades.add(probSubida);
-            probabilidades.add(probDescida);
-            probabilidades.add(probCompra);
-            probabilidades.add(probVenda);
+            empresa.setProbSubida((float) qtdeSubida/numReg);
+            empresa.setProbDescida((float) qtdeDescida/numReg);
+            empresa.setProbCompra((float) totalTotNeg/totalQuaTot + valorMedio);
+            empresa.setProbVenda((float) totalQuaTot/totalVolTot + valorMedio);
         }
-//        probabilidades.forEach((p) -> {
-//            System.out.println("Probs: " + p);
-//        });
-        return probabilidades;
     }
     
     public boolean sucesso(Float prob) {
         return new Random().nextInt(101) > prob;
     }
     
-    public Float probCond(Float probA, Float probB) {
+    public Float probCondicional(Float probA, Float probB) {
         return (probA * probB)/probB;
     }
     
-    public ArrayList<Float> atualizaSubDesc(ArrayList<Float> probabilidades, Integer SD) {
+    public void atualizarSubDesc(Empresa e, Integer SD) {
+        Float prob;
         switch (SD) {
             case 0: {
-                for (int i = 0; i < 4; i++)
-                    probabilidades.set(i, probCond(probabilidades.get(i), probabilidades.get(0)));
+                prob = e.getProbSubida();
                 break;
             }
             case 1: {
-                for (int i = 0; i < 4; i++) 
-                    probabilidades.set(i, probCond(probabilidades.get(i), probabilidades.get(1)));
+                prob = e.getProbDescida();
                 break;
             }
             default: {
-                for (int i = 0; i < 4; i++)
-                    probabilidades.set(i, probCond(probabilidades.get(i), 1 - (probabilidades.get(0) + probabilidades.get(1))));
+                prob = 1 - (e.getProbSubida() + e.getProbDescida());
             }
-        }
-        return probabilidades;
+        }        
+        e.setProbSubida(probCondicional(e.getProbSubida(), prob));
+        e.setProbDescida(probCondicional(e.getProbDescida(), prob));
+        e.setProbCompra(probCondicional(e.getProbCompra(), prob));
+        e.setProbVenda(probCondicional(e.getProbVenda(), prob));
     }
         
-    public Float predicao(Empresa empresa, ArrayList<Float> probabilidades) throws Exception {
+    public Float predicao(Empresa e) throws Exception {
         int nroAcoes = 0; 
         float saldo = 0.0f;
         boolean bom, regular, ruim, comprou, vendeu;
         Leitor l = new Leitor();
         
-        empresa.registro = l.interpretar(l.getHistoricoEmpresa(empresa.getNome(), 1996));
-        Arrays.sort(empresa.registro.toArray());
+        System.out.println(e.getNome());
         
-        for (Registro r : empresa.registro) {
-            comprou = sucesso(probabilidades.get(2));
-            vendeu = sucesso(probabilidades.get(3));
-            if (probabilidades.get(0) > probabilidades.get(1)) {
+        e.registro = l.interpretar(l.getHistoricoEmpresa(e.getNome(), 1996));
+        Arrays.sort(e.registro.toArray());
+        
+        for (Registro r : e.registro) {
+            comprou = sucesso(e.getProbCompra());
+            vendeu = sucesso(e.getProbVenda());
+            if (e.getProbSubida() > e.getProbDescida()) {
                 bom = true;
                 regular = false;
                 ruim = false;
-            } else if (probabilidades.get(0) < probabilidades.get(1)) {
+            } else if (e.getProbSubida() < e.getProbDescida()) {
                 bom = false;
                 regular = false;
                 ruim = true;
@@ -122,19 +115,19 @@ public class Investidor {
                 if (bom && comprou) {
                     nroAcoes++;
                     saldo -= (float) r.precoOfc;
-                    atualizaSubDesc(probabilidades, 0);
+                    atualizarSubDesc(e, 0);
                 } else if (regular && comprou) {
                     if (saldo >= 0){
                         nroAcoes++;
                         saldo -= (float) r.precoOfc;
-                        atualizaSubDesc(probabilidades, 0);
+                        atualizarSubDesc(e, 0);
                     } else {
-                        atualizaSubDesc(probabilidades, -1);
+                        atualizarSubDesc(e, -1);
                     }
                 } else if (ruim) {
-                    atualizaSubDesc(probabilidades, 1);
+                    atualizarSubDesc(e, 1);
                 } else {
-                    atualizaSubDesc(probabilidades, -1);
+                    atualizarSubDesc(e, -1);
                 }
             } else {
                 if (bom) {
@@ -151,13 +144,13 @@ public class Investidor {
                             nroAcoes--;
                         }
                     }
-                    atualizaSubDesc(probabilidades, 0);
+                    atualizarSubDesc(e, 0);
                 } else if (ruim) {
                     if (vendeu) {
                         saldo += (float) r.precoOfv;
                         nroAcoes--;
                     }
-                    atualizaSubDesc(probabilidades, 1);
+                    atualizarSubDesc(e, 1);
                 } else {
                     if (comprou) {
                         if (vendeu) {
@@ -172,7 +165,7 @@ public class Investidor {
                             nroAcoes--;
                         }
                     }
-                    atualizaSubDesc(probabilidades, -1);
+                    atualizarSubDesc(e, -1);
                 }
             }
         }
